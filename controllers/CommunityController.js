@@ -1,7 +1,4 @@
-import connectDB from "../DB/connectDB.js";
-import communityModel from "../models/communityModel.js";
 import { Snowflake } from "@theinternetfolks/snowflake";
-import mongoose from "mongoose";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -63,12 +60,12 @@ const getAllMembers = async (req, res) => {
 const getMyOwnedCommunity = async (req, res) => {
   try {
     const userId = req.user.id;
-    console.log(userId)
+    console.log(userId);
 
-    const data =await prisma.community.findMany({
+    const data = await prisma.community.findMany({
       data: {
         where: {
-          ownerId: userId
+          ownerId: userId,
         },
       },
     });
@@ -81,7 +78,22 @@ const getMyOwnedCommunity = async (req, res) => {
 
 const getMyJoinedCommunity = async (req, res) => {
   try {
-  } catch (error) {}
+    const user = req.user.id;
+
+    const data = await prisma.user.findFirst({
+      select: {
+        communities: true,
+      },
+      where: {
+        id: user,
+      },
+    });
+
+    console.log(data);
+    res.json(data);
+  } catch (error) {
+    res.json(error);
+  }
 };
 
 export {
